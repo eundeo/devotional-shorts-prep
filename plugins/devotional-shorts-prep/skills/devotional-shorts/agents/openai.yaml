@@ -1,0 +1,4 @@
+interface:
+  display_name: "묵상 쇼츠 제작"
+  short_description: "묵상 본문을 원고와 승인용 장면 계획으로 변환합니다"
+  default_prompt: "Use $devotional-shorts to create a Korean devotional Shorts draft from the full Bible passage."

@@ -1,0 +1,20 @@
+{
+  "name": "devotional-shorts",
+  "interface": {
+    "displayName": "Devotional Shorts"
+  },
+  "plugins": [
+    {
+      "name": "devotional-shorts-prep",
+      "source": {
+        "source": "local",
+        "path": "./plugins/devotional-shorts-prep"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
