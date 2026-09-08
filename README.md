@@ -4,6 +4,8 @@
 
 현재 릴리스는 플러그인 `1.0.1`, 콘텐츠 방법론 `1.1.0`, 작업 데이터 스키마 `1`이다. macOS에서 자동 검사와 설치를 검증했으며 Windows는 수신자 컴퓨터에서 [Windows 인수 안내](guides/windows-install-and-telegram.md)에 따라 확인한다.
 
+비공개 배포 위치: [GitHub 저장소](https://github.com/eundeo/devotional-shorts-prep) · [v1.0.1 Release](https://github.com/eundeo/devotional-shorts-prep/releases/tag/v1.0.1). 접근 권한이 있는 계정만 열거나 설치할 수 있다.
+
 ## 제공 기능
 
 - 입력 본문에 근거한 배경·핵심 해석·묵상 문장·적용·질문 생성
