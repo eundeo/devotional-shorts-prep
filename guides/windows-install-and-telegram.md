@@ -44,12 +44,12 @@ Codex에도 다음처럼 요청한다.
 
 ### A. GitHub에 게시한 경우
 
-배포 담당자가 제공한 실제 `OWNER/REPOSITORY`로 바꾼다. 이 문서에는 아직 게시 대상이 확정되지 않아 자리표시자로 남겨 두었다.
+비공개 저장소에 접근하도록 지인 GitHub 계정을 초대하고, 그 계정으로 Git 인증을 마친 뒤 실행한다.
 
 ```powershell
 git --version
 codex --version
-codex plugin marketplace add OWNER/REPOSITORY --ref v1.0.1
+codex plugin marketplace add eundeo/devotional-shorts-prep --ref v1.0.1
 codex plugin add devotional-shorts-prep@devotional-shorts
 codex plugin list --json --marketplace devotional-shorts
 ```
@@ -249,14 +249,14 @@ Codex에는 변수 값 출력 없이 설정 여부를 확인하고 `preflight`�
 
 ## 11. 배포 담당자의 GitHub 게시 절차
 
-현재 원격 저장소는 미지정이며 이 문서 작성만으로 업로드된 것은 아니다.
+배포 원격은 비공개 저장소 `eundeo/devotional-shorts-prep`이다. 지인에게 저장소 접근 권한을 부여하기 전에는 설치할 수 없다.
 
 1. GitHub 계정·저장소 이름·공개/비공개를 정한다. 지인 한 명 공유 목적이면 비공개 저장소와 초대 방식으로도 가능하다.
 2. `.agents/plugins/marketplace.json`과 `plugins/devotional-shorts-prep/`의 상대 경로를 보존한다. 이 안내서는 `guides/`에 함께 올린다.
 3. Git 추적 파일 전체와 기존 커밋 이력을 검토한다. 배포 ZIP 감사가 전체 저장소 이력 공개 검토를 대신하지는 않는다. 실제 토큰·설정, `jobs/`, 원본 자료·개인 이미지 파일은 게시하지 않는다.
 4. 검증된 릴리스 소스와 로컬 `v1.0.1` 태그를 게시한다. 원본 방법론 바이트가 바뀌지 않도록 Git 줄바꿈 설정을 확인하고 체크섬 검증된 ZIP도 함께 제공한다.
 5. GitHub Release에 ZIP·체크섬·marketplace.json과 이 안내서의 사본을 첨부한다. `dist/`는 Git 제외이므로 별도의 릴리스 자산 첨부가 필요하다.
-6. 이 문서의 `OWNER/REPOSITORY`를 실제 값으로 바꿔 전달한다. 나중에 추가한 이 안내서는 기존 v1.0.1 태그에는 없으므로 기본 브랜치 또는 릴리스 첨부 문서로 안내한다.
+6. 이 안내서는 기존 `v1.0.1` 태그 이후에 추가됐으므로 기본 브랜치 또는 릴리스 첨부 문서로 안내한다.
 7. 지인 계정으로 저장소 접근과 Windows 설치·Telegram·이미지 인수를 완료한다.
 
 GitHub에 올리는 것은 설치 파일 배포이며 Telegram 봇을 GitHub가 실행해 주는 것은 아니다. 봇 설정과 실행은 지인 컴퓨터에서 이뤄진다.

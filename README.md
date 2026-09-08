@@ -19,10 +19,10 @@
 
 ### GitHub에서 설치
 
-이 저장소가 `OWNER/REPOSITORY`에 게시되었다면 다음처럼 설치한다. 안정적인 설치에는 릴리스 태그를 사용한다.
+이 비공개 저장소에 접근할 수 있는 GitHub 계정에서 다음처럼 설치한다. 안정적인 설치에는 릴리스 태그를 사용한다.
 
 ```text
-codex plugin marketplace add OWNER/REPOSITORY --ref v1.0.1
+codex plugin marketplace add eundeo/devotional-shorts-prep --ref v1.0.1
 codex plugin add devotional-shorts-prep@devotional-shorts
 ```
 

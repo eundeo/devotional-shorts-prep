@@ -6,7 +6,7 @@
 
 [Windows 설치·Telegram 연결·제작 방식 변경 안내](../guides/windows-install-and-telegram.md): 지인에게 전달할 GitHub/ZIP 설치 절차, Python 확인, 전용 봇 설정, 원고·이미지 검토와 개인별 변경 방법. Windows 실환경 인수는 대기 상태다.
 
-[2026-09-08 사용 준비·배포·운영 보완 결과](operations-readiness-2026-09-08.md): OPS-02·03·04·06·08 내부 수정과 OPS-05·09 운영 정책 반영 완료. `1.0.1` 신규·업데이트 설치 검증 완료, Telegram 실환경과 원격 게시 정보만 대기한다.
+[2026-09-08 사용 준비·배포·운영 보완 결과](operations-readiness-2026-09-08.md): OPS-02·03·04·06·08 내부 수정과 OPS-05·09 운영 정책 반영 완료. `1.0.1` 신규·업데이트 설치와 비공개 GitHub 원격 준비 완료, Telegram 실환경 인수는 대기한다.
 
 ## 운영 규칙
 
