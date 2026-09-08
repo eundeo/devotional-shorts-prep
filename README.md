@@ -38,6 +38,7 @@ GitHub Release 또는 배포자에게 다음 파일을 함께 받는다.
 - `devotional-shorts-prep-1.0.1.zip.sha256`
 - `marketplace.json`
 - [Windows 설치·Telegram 연결 안내](guides/windows-install-and-telegram.md)
+- [지인 Codex용 전체 인수 실행서](guides/friend-codex-handoff.md)
 
 Windows 명령, Python 확인, 체크섬 검증과 설치 순서는 위 안내서를 따른다. 다른 운영체제의 기본 설치·업데이트 절차는 [플러그인 README](plugins/devotional-shorts-prep/README.md)에 있다.
 
