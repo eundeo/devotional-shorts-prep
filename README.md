@@ -93,7 +93,7 @@ python scripts/validate_project.py
 - `.env`, 실제 Telegram 값, `jobs/`, 원본 자료와 생성 이미지는 커밋하지 않는다.
 - `jobs/`에는 원고와 이미지 외에도 담당자 답장·사용자 ID가 포함될 수 있다.
 - `dist/`는 Git에서 제외하므로 검증된 ZIP·체크섬·독립 `marketplace.json`은 GitHub Release 자산으로 따로 올린다.
-- 현재 로컬 릴리스 태그는 `v1.0.1`이다. 공개 전에 전체 Git 이력과 릴리스 자산을 다시 확인한다.
+- 현재 릴리스 태그는 `v1.0.1`이며 검증된 ZIP·체크섬·마켓플레이스 파일은 비공개 GitHub Release에 첨부되어 있다.
 
 변경 내용은 [CHANGELOG](plugins/devotional-shorts-prep/CHANGELOG.md), 배포 인계는 [release-handoff](reports/release-handoff.md)를 따른다.
 
