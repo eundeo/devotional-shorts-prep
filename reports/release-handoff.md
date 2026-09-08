@@ -16,6 +16,8 @@
 
 ## 전달할 산출물
 
+- [Windows 설치·Telegram 연결·제작 방식 변경 안내](../guides/windows-install-and-telegram.md) — ZIP 외부에 함께 전달하거나 GitHub 기본 브랜치·릴리스에 첨부
+
 - [1.0.1 배포 준비 보고서](release-1.0.1.md)
 - [사용 준비·배포·운영 보완 결과](operations-readiness-2026-09-08.md)
 - [요구사항 추적표](requirements-traceability.md)
