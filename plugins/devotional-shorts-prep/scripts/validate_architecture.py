@@ -16,6 +16,7 @@ SKILL_ROOT = PLUGIN_ROOT / "skills" / "devotional-shorts"
 REQUIRED_FILES = (
     PLUGIN_ROOT / ".codex-plugin" / "plugin.json",
     PLUGIN_ROOT / ".env.example",
+    PLUGIN_ROOT / "OPERATIONS.md",
     SKILL_ROOT / "SKILL.md",
     SKILL_ROOT / "references" / "method.md",
     SKILL_ROOT / "references" / "examples.md",

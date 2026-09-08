@@ -117,6 +117,8 @@ class FakeAPI:
             return result
         if method == "getMe":
             return {"id": 777, "is_bot": True, "username": "devotional_test_bot"}
+        if method == "getWebhookInfo":
+            return {"url": "", "pending_update_count": 0}
         if method == "getChat":
             return {
                 "id": CONFIG.chat_id,
@@ -252,6 +254,35 @@ class TelegramWorkflowTest(unittest.TestCase):
         self.assertNotIn(TOKEN, str(caught.exception))
         self.assertIn("[REDACTED]", str(caught.exception))
 
+        send_calls = 0
+
+        def uncertain_send(_request: object, timeout: float) -> Response:
+            nonlocal send_calls
+            send_calls += 1
+            raise urllib.error.URLError("응답 유실")
+
+        with self.assertRaisesRegex(telegram_bot.TelegramError, "전송 여부가 불명확"):
+            telegram_bot.TelegramAPI(TOKEN, opener=uncertain_send).call("sendMessage")
+        self.assertEqual(send_calls, 1)
+
+        rate_calls = 0
+
+        def rate_limited(_request: object, timeout: float) -> Response:
+            nonlocal rate_calls
+            rate_calls += 1
+            return Response(
+                {
+                    "ok": False,
+                    "error_code": 429,
+                    "description": "Too Many Requests",
+                    "parameters": {"retry_after": 17},
+                }
+            )
+
+        with self.assertRaisesRegex(telegram_bot.TelegramError, "17초 뒤"):
+            telegram_bot.TelegramAPI(TOKEN, opener=rate_limited).call("getMe")
+        self.assertEqual(rate_calls, 1)
+
     def test_invalid_token_preflight_sends_no_report(self) -> None:
         invalid = FakeAPI({"getMe": [telegram_bot.TelegramError("인증 실패 [REDACTED]")]})
         with self.assertRaisesRegex(telegram_bot.TelegramError, "인증 실패"):
@@ -264,7 +295,16 @@ class TelegramWorkflowTest(unittest.TestCase):
         result = telegram_bot.preflight(CONFIG, api=api)
         self.assertEqual(result["messages_sent"], 0)
         self.assertEqual(result["approver_count"], 2)
-        self.assertEqual([call[0] for call in api.calls], ["getMe", "getChat", "getChatMember"])
+        self.assertFalse(result["webhook_configured"])
+        self.assertEqual(
+            [call[0] for call in api.calls],
+            ["getMe", "getWebhookInfo", "getChat", "getChatMember"],
+        )
+
+        webhook = FakeAPI({"getWebhookInfo": [{"url": "https://example.test/hook"}]})
+        with self.assertRaisesRegex(telegram_bot.TelegramError, "outgoing webhook"):
+            telegram_bot.preflight(CONFIG, api=webhook)
+        self.assertEqual([call[0] for call in webhook.calls], ["getMe", "getWebhookInfo"])
 
         denied = FakeAPI(
             {
@@ -292,16 +332,16 @@ class TelegramWorkflowTest(unittest.TestCase):
         methods = [call[0] for call in api.calls]
         self.assertEqual(
             methods,
-            ["getMe", "getChat", "getChatMember", "sendMessage", "sendDocument"],
+            ["getMe", "getWebhookInfo", "getChat", "getChatMember", "sendMessage", "sendDocument"],
         )
         self.assertEqual(result["status"], "SENT_FOR_APPROVAL")
-        summary = api.calls[3][1]["text"]
+        summary = api.calls[4][1]["text"]
         self.assertIn(JOB_ID, summary)
         self.assertIn("r001", summary)
         self.assertIn("예상 낭독: 110초", summary)
         self.assertIn("예상 장면: 2개", summary)
         self.assertIn("직접 답장", summary)
-        document_params = api.calls[4][1]
+        document_params = api.calls[5][1]
         self.assertEqual(document_params["reply_parameters"]["message_id"], result["summary_message_id"])
         stored = job_store.load_job(self.project, JOB_ID)
         self.assertEqual(stored["status"], "SENT_FOR_APPROVAL")
@@ -369,7 +409,7 @@ class TelegramWorkflowTest(unittest.TestCase):
         self.assertEqual(result["report_document_message_id"], 7402)
         self.assertEqual(
             [call[0] for call in api.calls],
-            ["getMe", "getChat", "getChatMember"],
+            ["getMe", "getWebhookInfo", "getChat", "getChatMember"],
         )
         self.assertEqual(job_store.load_job(self.project, JOB_ID)["status"], "SENT_FOR_APPROVAL")
 
@@ -483,6 +523,16 @@ class TelegramWorkflowTest(unittest.TestCase):
             )
             self.assertEqual(result["status"], expected_status)
             self.assertEqual(result["decision"], expected_decision)
+            if expected_status == "SENT_FOR_APPROVAL":
+                job_store.record_decision(
+                    self.project,
+                    job_id,
+                    "hold",
+                    report_id,
+                    approver_ids=[42],
+                    idempotency_key=f"telegram:decision:cleanup:{index}",
+                    decided_at=FIXED_NOW,
+                )
 
         approved_id = "ds-20260812-150009-aaaabb09"
         self.create(approved_id)
@@ -706,9 +756,34 @@ class TelegramWorkflowTest(unittest.TestCase):
 
         other = "ds-20260812-150010-aaaabb10"
         self.create(other)
-        self.send(other)
-        with self.assertRaisesRegex(approval_workflow.ApprovalError, "작업이 2개"):
-            approval_workflow.resolve_job_id(self.project, None)
+        blocked = FakeAPI()
+        with self.assertRaisesRegex(telegram_bot.TelegramError, "다른 Telegram 승인 대기 작업"):
+            self.send(other, blocked)
+        self.assertEqual(blocked.calls, [])
+        self.assertEqual(approval_workflow.resolve_job_id(self.project, None), JOB_ID)
+
+    def test_current_report_warning_section_is_summarized(self) -> None:
+        report = "# 보고서\n\n## 검토 메모\n\n### 확인이 필요한 사항\n\n- 본문 위치 확인\n\n## 승인 방법\n"
+        self.assertEqual(telegram_bot._extract_warnings(report), ["본문 위치 확인"])
+
+    def test_legacy_multiple_pending_jobs_block_reply_polling(self) -> None:
+        self.create()
+        self.send()
+        other = "ds-20260812-150011-aaaabb11"
+        self.create(other)
+        job_store.mark_report_sent(
+            self.project,
+            other,
+            8111,
+            report_sent_at=FIXED_NOW,
+            idempotency_key=f"{other}:1:legacy-pending",
+        )
+        api = FakeAPI()
+        with self.assertRaisesRegex(approval_workflow.ApprovalError, "승인 대기 작업이 여러 개"):
+            approval_workflow.check_approval(
+                self.project, JOB_ID, CONFIG, api=api, now=FIXED_NOW
+            )
+        self.assertEqual(api.calls, [])
 
     def test_status_reads_recovery_marker_when_job_json_is_corrupt(self) -> None:
         self.create()

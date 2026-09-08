@@ -1,6 +1,6 @@
 # Devotional Shorts Prep
 
-현재 릴리스는 `1.0.0`이며 [MIT 라이선스](LICENSE)로 배포한다. 콘텐츠 방법론은 `1.1.0`, 작업 데이터 스키마는 `1`이다.
+현재 릴리스는 `1.0.1`이며 [MIT 라이선스](LICENSE)로 배포한다. 콘텐츠 방법론은 `1.1.0`, 작업 데이터 스키마는 `1`이다. 운영 전에는 [운영 런북](OPERATIONS.md)을 확인한다.
 
 묵상 본문 전문을 묵상 포인트, 쇼츠 낭독 원고, 장면별 이미지 계획으로 변환하고 담당자 승인 후 이미지를 생성·전달하는 Codex 플러그인이다.
 
@@ -64,14 +64,14 @@ codex plugin add devotional-shorts-prep@devotional-shorts
 
 ```bash
 python3 plugins/devotional-shorts-prep/scripts/distribution.py build --output-dir <배포-출력-폴더>
-python3 plugins/devotional-shorts-prep/scripts/distribution.py verify --archive <배포-출력-폴더>/devotional-shorts-prep-1.0.0.zip
+python3 plugins/devotional-shorts-prep/scripts/distribution.py verify --archive <배포-출력-폴더>/devotional-shorts-prep-1.0.1.zip
 ```
 
 수신자는 배포 파일이 있는 폴더에서 함께 받은 `.zip.sha256`으로 ZIP을 확인하고, 전용 마켓플레이스 루트의 `plugins/` 아래에 압축을 푼다. 함께 받은 `marketplace.json`은 같은 루트의 `.agents/plugins/marketplace.json`으로 둔다. 그 후 해당 루트를 등록하고 플러그인을 설치한다.
 
 ```bash
-shasum -a 256 -c devotional-shorts-prep-1.0.0.zip.sha256
-python3 -m zipfile -e devotional-shorts-prep-1.0.0.zip <마켓플레이스-루트>/plugins
+shasum -a 256 -c devotional-shorts-prep-1.0.1.zip.sha256
+python3 -m zipfile -e devotional-shorts-prep-1.0.1.zip <마켓플레이스-루트>/plugins
 python3 <마켓플레이스-루트>/plugins/devotional-shorts-prep/scripts/distribution.py audit
 codex plugin marketplace add <마켓플레이스-루트>
 codex plugin add devotional-shorts-prep@devotional-shorts
@@ -107,7 +107,7 @@ codex plugin add devotional-shorts-prep@devotional-shorts
 
 ## 개발 기준
 
-프로젝트의 [`docs`](../../docs/README.md)를 번호순으로 구현한다. 각 문서 구현이 끝날 때 `reports/`에 세션 검증 보고서를 남기며, 미해결 누락은 다음 세션의 기능 작업보다 먼저 처리한다.
+소스 저장소에서 개발할 때는 저장소 루트의 `docs/README.md`를 번호순으로 구현한다. `docs/`와 `reports/`는 ZIP 배포물에 포함되지 않으며, 설치·운영자는 이 README와 동봉된 `OPERATIONS.md`만으로 운영할 수 있다.
 
 아키텍처 자체 점검은 다음 명령으로 실행한다.
 

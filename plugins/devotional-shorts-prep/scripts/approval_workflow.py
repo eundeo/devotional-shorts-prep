@@ -84,18 +84,7 @@ def resolve_job_id(
                 f"작업 {job_id}의 상태가 {required_status}가 아님. 현재 상태: {job.get('status')}"
             )
         return job_id
-    jobs_root = Path(project_root).expanduser().resolve() / "jobs"
-    candidates: list[str] = []
-    if jobs_root.is_dir():
-        for path in sorted(jobs_root.iterdir()):
-            if not path.is_dir() or not job_store.JOB_ID_RE.fullmatch(path.name):
-                continue
-            try:
-                job = job_store.load_job(project_root, path.name)
-            except job_store.JobStoreError:
-                continue
-            if job.get("status") == required_status:
-                candidates.append(path.name)
+    candidates = job_store.job_ids_with_status(project_root, required_status)
     if len(candidates) != 1:
         if not candidates:
             raise ApprovalError(
@@ -116,6 +105,12 @@ def check_approval(
     now: datetime | None = None,
 ) -> dict[str, Any]:
     resolved = resolve_job_id(project_root, job_id)
+    pending = job_store.job_ids_with_status(project_root, "SENT_FOR_APPROVAL")
+    if pending != [resolved]:
+        raise ApprovalError(
+            "Telegram 승인 대기 작업이 여러 개임. 복구: 봇당 승인 대기 작업을 하나만 유지하고 "
+            "나머지는 수정 요청 또는 보류로 정리한 뒤 다시 실행하십시오."
+        )
     replies = telegram_bot.check_replies(
         project_root, resolved, config, api=api, now=now
     )

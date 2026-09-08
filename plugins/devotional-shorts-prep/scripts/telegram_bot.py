@@ -27,6 +27,7 @@ MAX_SUMMARY_LENGTH = 4096
 MAX_DOCUMENT_BYTES = 50 * 1024 * 1024
 MAX_PHOTO_BYTES = 10 * 1024 * 1024
 APPROVAL_WINDOW = timedelta(hours=24)
+SAFE_RETRY_METHODS = {"getMe", "getChat", "getChatMember", "getWebhookInfo", "getUpdates"}
 
 
 class TelegramError(RuntimeError):
@@ -127,7 +128,7 @@ def _multipart(fields: Mapping[str, Any], files: Mapping[str, Path]) -> tuple[by
 
 
 class TelegramAPI:
-    """Small Bot API client with one immediate retry for transient failures."""
+    """Small Bot API client that retries only safe read operations."""
 
     def __init__(
         self,
@@ -154,7 +155,7 @@ class TelegramAPI:
                 return self._call_once(method, params or {}, files or {})
             except TelegramError as exc:
                 last_error = exc
-                if not exc.retryable or attempt == 1:
+                if not exc.retryable or attempt == 1 or method not in SAFE_RETRY_METHODS:
                     raise
         raise last_error or TelegramError("Telegram 요청 실패")
 
@@ -182,6 +183,7 @@ class TelegramAPI:
             with self.opener(request, timeout=self.timeout) as response:
                 payload = response.read()
         except urllib.error.HTTPError as exc:
+            parsed: dict[str, Any] = {}
             try:
                 payload = exc.read()
                 parsed = json.loads(payload.decode("utf-8"))
@@ -190,15 +192,29 @@ class TelegramAPI:
             except (OSError, UnicodeError, json.JSONDecodeError, TypeError, ValueError):
                 description = f"HTTP {exc.code}"
                 code = exc.code
+            parameters = parsed.get("parameters", {}) if isinstance(parsed, dict) else {}
+            retry_after = parameters.get("retry_after") if isinstance(parameters, dict) else None
+            recovery = (
+                f"{retry_after}초 뒤 다시 실행하십시오."
+                if code == 429 and isinstance(retry_after, int) and retry_after > 0
+                else "전송 여부가 불명확하므로 실제 그룹과 로컬 상태를 대조하십시오."
+                if method.startswith("send") and code >= 500
+                else "봇 권한과 Telegram 연결 상태를 확인한 뒤 다시 실행하십시오."
+            )
             raise TelegramError(
                 f"Telegram API {method} 실패({code}): {_redact(description, self.token)}. "
-                "복구: 봇 권한과 Telegram 연결 상태를 확인한 뒤 다시 실행하십시오.",
-                retryable=code == 429 or code >= 500,
+                f"복구: {recovery}",
+                retryable=code >= 500,
             ) from exc
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            recovery = (
+                "전송 여부가 불명확하므로 실제 그룹과 로컬 상태를 대조하십시오."
+                if method.startswith("send")
+                else "네트워크를 확인한 뒤 다시 실행하십시오."
+            )
             raise TelegramError(
                 f"Telegram API {method} 네트워크 실패: {_redact(exc, self.token)}. "
-                "복구: 네트워크를 확인한 뒤 다시 실행하십시오.",
+                f"복구: {recovery}",
                 retryable=True,
             ) from exc
         try:
@@ -211,10 +227,19 @@ class TelegramAPI:
             code = data.get("error_code") if isinstance(data, dict) else None
             description = data.get("description", "잘못된 API 응답") if isinstance(data, dict) else "잘못된 API 응답"
             numeric_code = code if isinstance(code, int) else 0
+            parameters = data.get("parameters", {}) if isinstance(data, dict) else {}
+            retry_after = parameters.get("retry_after") if isinstance(parameters, dict) else None
+            recovery = (
+                f"{retry_after}초 뒤 다시 실행하십시오."
+                if numeric_code == 429 and isinstance(retry_after, int) and retry_after > 0
+                else "전송 여부가 불명확하므로 실제 그룹과 로컬 상태를 대조하십시오."
+                if method.startswith("send") and numeric_code >= 500
+                else "설정과 봇 권한을 확인하십시오."
+            )
             raise TelegramError(
                 f"Telegram API {method} 실패({numeric_code or 'unknown'}): "
-                f"{_redact(description, self.token)}. 복구: 설정과 봇 권한을 확인하십시오.",
-                retryable=numeric_code == 429 or numeric_code >= 500,
+                f"{_redact(description, self.token)}. 복구: {recovery}",
+                retryable=numeric_code >= 500,
             )
         return data["result"]
 
@@ -228,6 +253,14 @@ def preflight(config: TelegramConfig, *, api: Any | None = None) -> dict[str, An
     bot = client.call("getMe")
     if not isinstance(bot, dict) or bot.get("is_bot") is not True or not isinstance(bot.get("id"), int):
         raise TelegramError("getMe 응답이 유효한 봇 정보가 아님. 복구: 봇 토큰을 다시 확인하십시오.")
+    webhook = client.call("getWebhookInfo")
+    if not isinstance(webhook, dict) or not isinstance(webhook.get("url", ""), str):
+        raise TelegramError("getWebhookInfo 응답이 유효하지 않음. 복구: 봇 설정을 확인하십시오.")
+    if webhook.get("url"):
+        raise TelegramError(
+            "봇에 outgoing webhook이 설정되어 getUpdates 승인을 조회할 수 없음. "
+            "복구: 이 플러그인 전용 봇을 사용하거나 운영자가 기존 webhook 소유자와 조정하십시오."
+        )
     chat = client.call("getChat", {"chat_id": config.chat_id})
     if not isinstance(chat, dict) or chat.get("id") != config.chat_id:
         raise TelegramError("대상 그룹 정보가 설정과 다름. 복구: TELEGRAM_CHAT_ID를 확인하십시오.")
@@ -258,14 +291,18 @@ def preflight(config: TelegramConfig, *, api: Any | None = None) -> dict[str, An
         "chat_type": chat["type"],
         "send_capability": capability,
         "approver_count": len(config.approver_ids),
+        "webhook_configured": False,
         "messages_sent": 0,
     }
 
 
 def _extract_warnings(report_text: str) -> list[str]:
-    marker = "## 검토 주의사항"
-    if marker not in report_text:
-        return ["보고서의 검토 주의사항 섹션을 확인할 수 없음"]
+    marker = next(
+        (item for item in ("### 확인이 필요한 사항", "## 검토 주의사항") if item in report_text),
+        None,
+    )
+    if marker is None:
+        return ["보고서의 확인 필요 섹션을 찾을 수 없음"]
     section = report_text.split(marker, 1)[1].split("\n## ", 1)[0]
     lines = [line.strip().removeprefix("- ") for line in section.splitlines() if line.strip()]
     return [] if lines == ["없음"] else lines
@@ -368,6 +405,17 @@ def send_report(
             "복구: 작업 상태와 현재 리비전을 확인하십시오."
         )
 
+    other_pending = [
+        item
+        for item in job_store.job_ids_with_status(project_root, "SENT_FOR_APPROVAL")
+        if item != job_id
+    ]
+    if other_pending:
+        raise TelegramError(
+            "다른 Telegram 승인 대기 작업이 있음: " + ", ".join(other_pending) + ". "
+            "복구: 기존 작업의 승인·수정 요청·보류를 먼저 처리하십시오."
+        )
+
     client = _api_for(config, api)
     preflight(config, api=client)
     if report_path.stat().st_size > MAX_DOCUMENT_BYTES:
@@ -433,7 +481,8 @@ def send_report(
             )
             raise TelegramError(
                 f"요약 메시지 {summary_message_id} 전송 후 보고서 파일 전송에 실패함. "
-                "복구: 같은 send-report 명령을 다시 실행하면 요약은 재사용되고 파일만 재시도됩니다."
+                "복구: 그룹에 보고서 파일이 없는지 확인한 뒤에만 같은 send-report 명령을 "
+                "다시 실행하십시오. 요약은 재사용되고 파일만 재시도됩니다."
             ) from exc
 
     job_store.mark_report_sent(

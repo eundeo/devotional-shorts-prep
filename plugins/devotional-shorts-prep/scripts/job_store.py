@@ -738,6 +738,24 @@ def load_job(project_root: Path | str, job_id: str) -> dict[str, Any]:
     return data
 
 
+def job_ids_with_status(project_root: Path | str, status: str) -> list[str]:
+    """Return valid job IDs in one status without mutating unreadable jobs."""
+    jobs_root = _jobs_root(project_root)
+    if not jobs_root.is_dir():
+        return []
+    matches: list[str] = []
+    for path in sorted(jobs_root.iterdir()):
+        if not path.is_dir() or not JOB_ID_RE.fullmatch(path.name):
+            continue
+        try:
+            job = load_job(project_root, path.name)
+        except JobStoreError:
+            continue
+        if job.get("status") == status:
+            matches.append(path.name)
+    return matches
+
+
 def _current_revision(job: dict[str, Any]) -> dict[str, Any]:
     number = job.get("current_revision")
     revisions = job.get("revisions")

@@ -122,6 +122,8 @@ class FakeAPI:
         self.calls.append((method, dict(params or {}), dict(files or {})))
         if method == "getMe":
             return {"id": 777, "is_bot": True}
+        if method == "getWebhookInfo":
+            return {"url": "", "pending_update_count": 0}
         if method == "getChat":
             return {
                 "id": CONFIG.chat_id,
