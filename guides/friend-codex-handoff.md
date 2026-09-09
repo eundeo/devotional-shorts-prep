@@ -1,11 +1,20 @@
 # 지인 Codex용 묵상 쇼츠 플러그인 인수 실행서
 
 > 대상: Windows + Codex CLI  
-> 공개 저장소: `eundeo/devotional-shorts-prep`
+> 공개 저장소: <https://github.com/eundeo/devotional-shorts-prep>
 > 인수 버전: `v1.0.1`  
 > 플러그인/스킬: `devotional-shorts-prep` / `devotional-shorts`
 
 이 파일은 설명서이자 **지인의 Codex가 설치부터 실제 인수 시험까지 순차 실행하기 위한 지시서**다. 지인은 이 파일과 마지막 장의 첫 메시지를 Codex에 함께 전달한다.
+
+## 공개 배포 주소
+
+- 저장소 웹 주소: <https://github.com/eundeo/devotional-shorts-prep>
+- Git 복제 주소: `https://github.com/eundeo/devotional-shorts-prep.git`
+- `v1.0.1` 릴리스: <https://github.com/eundeo/devotional-shorts-prep/releases/tag/v1.0.1>
+- 이 실행서의 최신 원본: <https://github.com/eundeo/devotional-shorts-prep/blob/main/guides/friend-codex-handoff.md>
+
+저장소는 공개 상태이므로 읽기와 설치를 위해 GitHub 협업자 초대나 개인 액세스 토큰이 필요하지 않다.
 
 ## 1. Codex 실행 원칙
 
