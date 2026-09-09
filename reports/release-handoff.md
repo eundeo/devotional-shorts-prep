@@ -2,9 +2,9 @@
 
 ## 현재 판정
 
-플러그인 `1.0.1`의 내부 수정, 자동 검사, 신규 설치, 기존 `1.0.0` 업데이트, 배포 ZIP 준비가 완료됐다. 다른 사용자는 ZIP 또는 비공개 GitHub 저장소 `eundeo/devotional-shorts-prep`으로 설치할 수 있다. 실제 Telegram 운영은 각 사용자의 환경변수와 테스트 그룹 인수가 필요하다.
+플러그인 `1.0.1`의 내부 수정, 자동 검사, 신규 설치, 기존 `1.0.0` 업데이트, 배포 ZIP 준비가 완료됐다. 다른 사용자는 ZIP 또는 공개 GitHub 저장소 `eundeo/devotional-shorts-prep`으로 별도 초대 없이 설치할 수 있다. 실제 Telegram 운영은 각 사용자의 환경변수와 테스트 그룹 인수가 필요하다.
 
-2026-09-09 기준 [비공개 저장소](https://github.com/eundeo/devotional-shorts-prep)에 전체 소스와 `v1.0.1` 태그를 게시했고, [GitHub Release](https://github.com/eundeo/devotional-shorts-prep/releases/tag/v1.0.1)에 배포 파일과 Windows 안내서를 첨부했다.
+2026-09-09 기준 [공개 저장소](https://github.com/eundeo/devotional-shorts-prep)에 전체 소스와 `v1.0.1` 태그를 게시했고, [GitHub Release](https://github.com/eundeo/devotional-shorts-prep/releases/tag/v1.0.1)에 배포 파일과 Windows 안내서를 첨부했다.
 
 현재 사용자 Codex에는 `1.0.1` 설치·활성화와 설치 캐시 재검증까지 완료했다. 새 Codex 작업부터 갱신된 스킬을 사용한다.
 

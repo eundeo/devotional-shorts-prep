@@ -2,7 +2,7 @@
 
 ## 배포 판정
 
-`1.0.1` 소스와 결정적 ZIP은 배포 완료다. 내부 미해결 보완사항은 없다. 비공개 [GitHub 저장소](https://github.com/eundeo/devotional-shorts-prep)에 `main`과 `v1.0.1` 태그를 게시하고 [v1.0.1 Release](https://github.com/eundeo/devotional-shorts-prep/releases/tag/v1.0.1)에 ZIP·체크섬·marketplace.json·Windows 안내서를 첨부했다. 실제 Telegram 인수와 지인 저장소 초대가 사용자별 외부 단계다.
+`1.0.1` 소스와 결정적 ZIP은 배포 완료다. 내부 미해결 보완사항은 없다. 공개 [GitHub 저장소](https://github.com/eundeo/devotional-shorts-prep)에 `main`과 `v1.0.1` 태그를 게시하고 [v1.0.1 Release](https://github.com/eundeo/devotional-shorts-prep/releases/tag/v1.0.1)에 ZIP·체크섬·marketplace.json·Windows 안내서를 첨부했다. 실제 Telegram 인수는 사용자별 외부 단계다.
 
 ## 릴리스 식별 정보
 
@@ -79,7 +79,7 @@
 - [x] ZIP 내 설치·운영·복구·개인정보 안내 포함
 - [ ] 사용자 환경의 Telegram 비밀변수 설정과 테스트 그룹 인수
 - [ ] 운영 데이터 담당자·백업 위치·보존 예외 기록
-- [x] 비공개 원격 저장소·공개 범위 지정
+- [x] 공개 원격 저장소·공개 범위 지정
 - [x] 지정된 원격에 소스·태그·ZIP·체크섬 게시
 
 미체크 항목은 외부 환경 또는 배포 대상이 있어야 수행할 수 있으며 `1.0.1` 내부 구현의 결함이나 누락은 아니다.

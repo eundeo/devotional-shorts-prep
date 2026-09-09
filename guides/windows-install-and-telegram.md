@@ -44,7 +44,7 @@ Codex에도 다음처럼 요청한다.
 
 ### A. GitHub에 게시한 경우
 
-비공개 저장소에 접근하도록 지인 GitHub 계정을 초대하고, 그 계정으로 Git 인증을 마친 뒤 실행한다.
+공개 저장소이므로 지인 계정 초대 없이 실행할 수 있다.
 
 ```powershell
 git --version
@@ -54,7 +54,7 @@ codex plugin add devotional-shorts-prep@devotional-shorts
 codex plugin list --json --marketplace devotional-shorts
 ```
 
-원격 저장소에 `v1.0.1` 태그가 게시된 뒤 사용할 수 있다. 비공개 저장소는 지인 GitHub 계정에 접근 권한을 부여하고 해당 컴퓨터에서 Git 인증을 완료해야 한다. 토큰을 저장소 URL에 넣지 않는다.
+원격 저장소에 `v1.0.1` 태그가 공개되어 있어 별도 초대 없이 사용할 수 있다. 쓰기 작업이 아니라 설치만 할 때는 GitHub 토큰을 저장소 URL에 넣지 않는다.
 
 `codex` 명령이 없으면 Codex CLI 설치 또는 PATH 설정이 필요하다. 플러그인 하위 명령이 없으면 사용하는 CLI 버전을 확인한다. 현재 배포 검증에 사용한 CLI는 0.153.1이다.
 
@@ -249,15 +249,15 @@ Codex에는 변수 값 출력 없이 설정 여부를 확인하고 `preflight`�
 
 ## 11. 배포 담당자의 GitHub 게시 절차
 
-배포 원격은 비공개 저장소 `eundeo/devotional-shorts-prep`이다. 지인에게 저장소 접근 권한을 부여하기 전에는 설치할 수 없다.
+배포 원격은 공개 저장소 `eundeo/devotional-shorts-prep`이다. 지인은 별도 초대 없이 설치할 수 있다.
 
-1. GitHub 계정·저장소 이름·공개/비공개를 정한다. 지인 한 명 공유 목적이면 비공개 저장소와 초대 방식으로도 가능하다.
+1. GitHub 저장소 이름과 공개 범위를 확인한다. 현재 저장소는 누구나 읽고 설치할 수 있는 공개 저장소다.
 2. `.agents/plugins/marketplace.json`과 `plugins/devotional-shorts-prep/`의 상대 경로를 보존한다. 이 안내서는 `guides/`에 함께 올린다.
 3. Git 추적 파일 전체와 기존 커밋 이력을 검토한다. 배포 ZIP 감사가 전체 저장소 이력 공개 검토를 대신하지는 않는다. 실제 토큰·설정, `jobs/`, 원본 자료·개인 이미지 파일은 게시하지 않는다.
 4. 검증된 릴리스 소스와 로컬 `v1.0.1` 태그를 게시한다. 원본 방법론 바이트가 바뀌지 않도록 Git 줄바꿈 설정을 확인하고 체크섬 검증된 ZIP도 함께 제공한다.
 5. GitHub Release에 ZIP·체크섬·marketplace.json과 이 안내서의 사본을 첨부한다. `dist/`는 Git 제외이므로 별도의 릴리스 자산 첨부가 필요하다.
 6. 이 안내서는 기존 `v1.0.1` 태그 이후에 추가됐으므로 기본 브랜치 또는 릴리스 첨부 문서로 안내한다.
-7. 지인 계정으로 저장소 접근과 Windows 설치·Telegram·이미지 인수를 완료한다.
+7. 지인의 Windows 환경에서 공개 저장소 접근과 설치·Telegram·이미지 인수를 완료한다.
 
 GitHub에 올리는 것은 설치 파일 배포이며 Telegram 봇을 GitHub가 실행해 주는 것은 아니다. 봇 설정과 실행은 지인 컴퓨터에서 이뤄진다.
 

@@ -4,7 +4,7 @@
 
 현재 릴리스는 플러그인 `1.0.1`, 콘텐츠 방법론 `1.1.0`, 작업 데이터 스키마 `1`이다. macOS에서 자동 검사와 설치를 검증했으며 Windows는 수신자 컴퓨터에서 [Windows 인수 안내](guides/windows-install-and-telegram.md)에 따라 확인한다.
 
-비공개 배포 위치: [GitHub 저장소](https://github.com/eundeo/devotional-shorts-prep) · [v1.0.1 Release](https://github.com/eundeo/devotional-shorts-prep/releases/tag/v1.0.1). 접근 권한이 있는 계정만 열거나 설치할 수 있다.
+공개 배포 위치: [GitHub 저장소](https://github.com/eundeo/devotional-shorts-prep) · [v1.0.1 Release](https://github.com/eundeo/devotional-shorts-prep/releases/tag/v1.0.1). GitHub 계정 초대 없이 누구나 열고 설치할 수 있다.
 
 ## 제공 기능
 
@@ -21,7 +21,7 @@
 
 ### GitHub에서 설치
 
-이 비공개 저장소에 접근할 수 있는 GitHub 계정에서 다음처럼 설치한다. 안정적인 설치에는 릴리스 태그를 사용한다.
+다음처럼 공개 저장소에서 설치한다. 안정적인 설치에는 릴리스 태그를 사용한다.
 
 ```text
 codex plugin marketplace add eundeo/devotional-shorts-prep --ref v1.0.1
@@ -94,7 +94,7 @@ python scripts/validate_project.py
 - `.env`, 실제 Telegram 값, `jobs/`, 원본 자료와 생성 이미지는 커밋하지 않는다.
 - `jobs/`에는 원고와 이미지 외에도 담당자 답장·사용자 ID가 포함될 수 있다.
 - `dist/`는 Git에서 제외하므로 검증된 ZIP·체크섬·독립 `marketplace.json`은 GitHub Release 자산으로 따로 올린다.
-- 현재 릴리스 태그는 `v1.0.1`이며 검증된 ZIP·체크섬·마켓플레이스 파일은 비공개 GitHub Release에 첨부되어 있다.
+- 현재 릴리스 태그는 `v1.0.1`이며 검증된 ZIP·체크섬·마켓플레이스 파일은 공개 GitHub Release에 첨부되어 있다.
 
 변경 내용은 [CHANGELOG](plugins/devotional-shorts-prep/CHANGELOG.md), 배포 인계는 [release-handoff](reports/release-handoff.md)를 따른다.
 
